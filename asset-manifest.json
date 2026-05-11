@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/jiari-reward/static/css/main.b64bb049.css",
+    "main.js": "/jiari-reward/static/js/main.6e777d05.js",
+    "index.html": "/jiari-reward/index.html",
+    "main.b64bb049.css.map": "/jiari-reward/static/css/main.b64bb049.css.map",
+    "main.6e777d05.js.map": "/jiari-reward/static/js/main.6e777d05.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.b64bb049.css",
+    "static/js/main.6e777d05.js"
+  ]
+}
