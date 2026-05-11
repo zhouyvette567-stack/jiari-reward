@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/jiari-reward/static/css/main.b64bb049.css",
-    "main.js": "/jiari-reward/static/js/main.6e777d05.js",
+    "main.css": "/jiari-reward/static/css/main.50d32f8a.css",
+    "main.js": "/jiari-reward/static/js/main.f3b07c1a.js",
     "index.html": "/jiari-reward/index.html",
-    "main.b64bb049.css.map": "/jiari-reward/static/css/main.b64bb049.css.map",
-    "main.6e777d05.js.map": "/jiari-reward/static/js/main.6e777d05.js.map"
+    "main.50d32f8a.css.map": "/jiari-reward/static/css/main.50d32f8a.css.map",
+    "main.f3b07c1a.js.map": "/jiari-reward/static/js/main.f3b07c1a.js.map"
   },
   "entrypoints": [
-    "static/css/main.b64bb049.css",
-    "static/js/main.6e777d05.js"
+    "static/css/main.50d32f8a.css",
+    "static/js/main.f3b07c1a.js"
   ]
 }
