@@ -8,35 +8,12 @@ const STYLES = [
   { id: 'gentle', label: '温柔治愈', icon: '🌸' },
 ];
 
-function generatePraise(input, style) {
-  const s = input.trim();
-  if (!s) return '请先告诉我，你今天做了什么？';
-
-  const templates = {
-    literary: [
-      `古语有云："不积跬步，无以至千里。"今日"${s}"，虽为小事，却足见君之志在千里。古人云一屋不扫何以扫天下，君今日之所作所为，正是"修身齐家"的最好注脚。愿君日日如此，静水流深。`,
-      `世人皆道大事方显英雄本色，我却见"${s}"中自有真章。这不急不躁、认认真真的模样，恰似那"采菊东篱下"的悠然。能静下心做一件小事的人，本身就是这个世界最温柔的风景。`,
-      `王阳明说"知行合一"，你今天"${s}"，便做到了这一点。世间最可贵的，不是宏大的誓言，而是像你这样，把每一件小事都当作修行。这份笃定，胜过千言万语。`,
-    ],
-    passion: [
-      `这就是传说中的"${s}"？！兄弟/姐妹，你也太强了吧！！这波操作直接封神！这就是实打实的实力，不靠运气，不靠天赋，全靠行动力！你是认真的吗？太绝了！`,
-      `"${s}"——就这短短几个字，我仿佛看到了一个浴火重生的人！别小看这件事，多少人连想都不敢想！你就是那个敢于行动的勇者！继续保持这个势头，天都能给你捅个窟窿！`,
-      `这"${s}"也太硬核了吧！你简直是在用行动告诉大家：普通人也能做到不普通的事情！这种执行力，放在任何战场上都是王牌选手！冲冲冲！`,
-    ],
-    cyber: [
-      `🌌 赛博虚空之中，你"${s}"的信号穿越了数据洪流。\n\n佛曰：一花一世界，一叶一菩提。\n在0与1的永恒轮回中，你的这个选择，就是那个让宇宙程序跳出死循环的关键变量。\n\n你不必成为超级AI，因为此刻的你，已经是一个完美的、不可复制的碳基生命体。\n阿门，不是，阿弥陀佛。愿你今晚的梦，帧率稳定在120fps。`,
-      `🔮 检测到人类行为异常——"${s}"。\n\n这不符合慵懒算法的预测模型。你的意志力参数已突破上限。\n\n宇宙不是模拟器，但即便它是，你这个NPC也是少有的有灵魂的那个。\n继续运行你的独特程序吧，这个世界的多样性数据库需要你。\n功德 +1 ✅`,
-    ],
-    gentle: [
-      `你知道吗，"${s}"这件事，说起来好像很小，但它其实需要很大的勇气呢。\n\n能在忙碌的生活中停下来，认真对待自己，这本身就是一种了不起的能力。\n\n今天的你很棒，明天的你也会很棒。慢慢来，一切都来得及。\n送你一朵云 ☁️，希望今晚的风可以温柔一点。`,
-      `"${s}"呀……听起来是一件很温暖的事情。\n\n我在想，能做出这个选择的人，心里一定住着一个很可爱的小孩吧。\n\n这个世界有时候会让人觉得很累，但正是因为有你这样的人在认真生活，它才变得值得。\n今天辛苦啦，早点休息，梦里会有星星的 ✨`,
-      `嘿，关于"${s}"这件事，我想认真地夸夸你。\n\n很多人觉得一定要做"大事"才算优秀，但我觉得不是的。能把一件小事做好，说明你对生活是有热情的。\n\n这份热情很珍贵，请不要忘记它。\n如果累了就休息一下，但请相信——你做的事情，比你以为的更有意义。🌻`,
-    ],
-  };
-
-  const arr = templates[style] || templates.gentle;
-  return arr[Math.floor(Math.random() * arr.length)];
-}
+const STYLE_PROMPTS = {
+  literary: '你是一位儒雅的书生，说话用词古风雅致，引用古诗词和名言。你的赞美有文学气息，用词考究。',
+  passion: '你是一位热血少年，说话充满激情和能量。你的赞美充满力量，用感叹号，语气激动，像在为朋友打call。',
+  cyber: '你是一位"赛博佛祖"，融合了佛教哲学和赛博朋克风格。你用宇宙、数据、算法等科技隐喻来解读人生。说话既有禅意又有趣味。偶尔用emoji。',
+  gentle: '你是一位温柔治愈的朋友，说话温暖细腻，像在给朋友写一封信。你的赞美真诚不做作，让人感到被理解和接纳。',
+};
 
 function detectBadge(input) {
   const s = input.toLowerCase();
@@ -53,6 +30,53 @@ function detectBadge(input) {
   return map.find(m => m.keywords.some(k => s.includes(k))) || null;
 }
 
+// Fallback templates when API is unavailable
+const FALLBACKS = {
+  literary: '古语有云："不积跬步，无以至千里。"你今日所为，虽为小事，却足见志在千里。愿君日日如此，静水流深。',
+  passion: '这也太强了吧！！这波操作直接封神！不靠运气，全靠行动力！继续保持这个势头，冲冲冲！',
+  cyber: '检测到碳基生命体执行了一次高难度操作。你的意志力参数已突破上限。功德+1。',
+  gentle: '你知道吗，这件事说起来好像很小，但它其实需要很大的勇气呢。今天的你很棒，慢慢来，一切都来得及。',
+};
+
+async function callDeepSeek(input, style) {
+  const systemPrompt = `${STYLE_PROMPTS[style] || STYLE_PROMPTS.gentle}
+
+规则：
+1. 用户会告诉你今天做的一件小事，你要认真夸奖这件事。
+2. 不要泛泛地说"你真棒"，要针对性分析这件事背后的品质——意志力、自律、善良、自我关怀等。
+3. 回复控制在100-200字。
+4. 直接输出夸奖内容，不要加引号、标题或多余格式。`;
+
+  try {
+    const response = await fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer sk-c4ec8225108e4db9af2c5581bff8f7db',
+      },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: `今天我${input}` },
+        ],
+        max_tokens: 300,
+        temperature: 0.9,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`API returned ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.choices?.[0]?.message?.content || FALLBACKS[style] || FALLBACKS.gentle;
+  } catch (err) {
+    console.error('DeepSeek API error:', err);
+    return null; // null means use fallback
+  }
+}
+
 export default function PraiseGenerator({ addSand, addBadge }) {
   const [input, setInput] = useState('');
   const [style, setStyle] = useState('gentle');
@@ -60,18 +84,25 @@ export default function PraiseGenerator({ addSand, addBadge }) {
   const [showModal, setShowModal] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const handleSubmit = () => {
-    if (!input.trim()) return;
+  const handleSubmit = async () => {
+    if (!input.trim() || isGenerating) return;
     setIsGenerating(true);
-    setTimeout(() => {
-      const result = generatePraise(input, style);
-      setPraise(result);
-      setIsGenerating(false);
-      setShowModal(true);
-      addSand();
-      const badge = detectBadge(input);
-      if (badge) addBadge(badge);
-    }, 800 + Math.random() * 700);
+
+    // Show loading for at least 1s for better UX
+    const apiPromise = callDeepSeek(input, style);
+    const minDelay = new Promise(resolve => setTimeout(resolve, 1000));
+
+    const result = await apiPromise;
+    await minDelay;
+
+    const finalPraise = result || FALLBACKS[style] || FALLBACKS.gentle;
+    setPraise(finalPraise);
+    setIsGenerating(false);
+    setShowModal(true);
+    addSand();
+
+    const badge = detectBadge(input);
+    if (badge) addBadge(badge);
   };
 
   return (
@@ -119,7 +150,7 @@ export default function PraiseGenerator({ addSand, addBadge }) {
           {isGenerating ? (
             <span className="flex items-center justify-center gap-2">
               <motion.span animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1 }} className="inline-block">✨</motion.span>
-              正在为你生成专属夸夸...
+              AI 正在为你生成专属夸夸...
             </span>
           ) : (
             '领取奖励 🎁'
