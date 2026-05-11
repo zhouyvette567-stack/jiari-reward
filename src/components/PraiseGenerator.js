@@ -30,21 +30,46 @@ function detectBadge(input) {
   return map.find(m => m.keywords.some(k => s.includes(k))) || null;
 }
 
-// Fallback templates when API is unavailable
+// Fallback templates when API is unavailable (multiple per style for variety)
 const FALLBACKS = {
-  literary: '古语有云："不积跬步，无以至千里。"你今日所为，虽为小事，却足见志在千里。愿君日日如此，静水流深。',
-  passion: '这也太强了吧！！这波操作直接封神！不靠运气，全靠行动力！继续保持这个势头，冲冲冲！',
-  cyber: '检测到碳基生命体执行了一次高难度操作。你的意志力参数已突破上限。功德+1。',
-  gentle: '你知道吗，这件事说起来好像很小，但它其实需要很大的勇气呢。今天的你很棒，慢慢来，一切都来得及。',
+  literary: [
+    '古语有云："不积跬步，无以至千里。"你今日所为，虽为小事，却足见志在千里。古人云"千里之行始于足下"，你正在用每一天的小行动，丈量属于自己的山河。愿君日日如此，静水流深。',
+    '王阳明有言："知行合一。"你今日之所作所为，正是将善意与自律化为行动的最佳诠释。世间最难得的不是宏大的誓言，而是日复一日的坚持。你的这份踏实，值得被看见。',
+    '苏轼曾写道："古之立大事者，不惟有超世之才，亦必有坚忍不拔之志。"你今日虽行的是小事，却彰显了不凡的意志。请继续保持这份笃定，时光终将给你最好的回答。',
+    '《论语》有言："德不孤，必有邻。"你用行动证明了，善良和自律从来不是孤独的事。今日的小小努力，如同播下一颗种子，终会在某个春天开出灿烂的花来。',
+  ],
+  passion: [
+    '这也太强了吧！！这波操作直接封神！不靠运气，全靠行动力！你知道多少人光想想就放弃了吗？你直接就是做了！这种执行力真的是顶配！继续保持这个势头，冲冲冲！',
+    '我直接给你跪了！！这也太厉害了吧！别看这件事好像很简单，但能做到的人真的不多！你就是那种说到做到的行动派！我宣布，今天的最佳玩家就是你！继续炸裂输出！',
+    '天呐天呐天呐！！你做到了！你知道这背后需要多大的自律和决心吗？别人还在犹豫的时候，你已经把事情做完了！这种不废话、直接干的作风，我真的是服到五体投地！',
+    '卧槽这也太猛了！！每次看到你这样做，都觉得你整个人在发光诶！不是夸张，能做到这种小事坚持的人，格局真的不一样！你就是未来的大佬，我说的！冲就完了！',
+  ],
+  cyber: [
+    '📡 检测到碳基生命体执行了一次高难度操作。你的意志力参数已突破上限，自律指标飙升至99.7%。系统判定：你正在以量子级别的稳定度进化。宇宙已记录此次壮举。功德+1。🔋',
+    '🧠 意识上传进度：今日份额已完成。检测到你的多巴胺回路正在优化，韧性参数持续攀升。你以为这只是小事？不，这是你的自我迭代程序在运行。版本号已更新。功德+1。✨',
+    '⚡ 警告：检测到高能量个体。你的行动数据已被标记为"优秀模板"，将在下一个文明周期作为参考案例。这不是小事，这是你在改写自己的底层代码。功德+1。🔮',
+    '🌐 量子纠缠报告：你今日的行为已与未来的自己产生共振。概率波函数坍缩结果显示——你正在走向一个很棒的方向。不要停下，宇宙正在为你铺路。功德+1。🌟',
+  ],
+  gentle: [
+    '你知道吗，这件事说起来好像很小，但它其实需要很大的勇气和自律呢。很多人想做但一直没做，而你做到了——光是这一点，就已经非常了不起了。今天的你很棒，慢慢来，一切都来得及。',
+    '我特别想告诉你：你值得被好好看见。这件事也许在你的计划里只是很小的一部分，但对我来说，你愿意去做本身就很珍贵。辛苦了，记得也好好犒劳自己一下哦。',
+    '有时候我觉得，最动人的不是那些轰轰烈烈的大事，而是像今天这样，安安静静地做了一件对自己好的小事。这本身就是一种很了不起的能力——照顾好自己的能力。你做得很好，真的。',
+    '嘿，谢谢你今天这么努力。我不知道你经历了什么才走到这一步，但我知道这并不容易。每一次小小的好习惯，都是你对自己温柔的方式。今天也辛苦了，晚安前记得给自己一个拥抱。',
+  ],
 };
+
+function getFallback(style) {
+  const list = FALLBACKS[style] || FALLBACKS.gentle;
+  return list[Math.floor(Math.random() * list.length)];
+}
 
 async function callDeepSeek(input, style) {
   const systemPrompt = `${STYLE_PROMPTS[style] || STYLE_PROMPTS.gentle}
 
 规则：
 1. 用户会告诉你今天做的一件小事，你要认真夸奖这件事。
-2. 不要泛泛地说"你真棒"，要针对性分析这件事背后的品质——意志力、自律、善良、自我关怀等。
-3. 回复控制在100-200字。
+2. 不要泛泛地说"你真棒"，要针对用户具体做了什么事进行深入分析——这件事体现了什么品质（意志力、自律、善良、自我关怀等），为什么值得被肯定。
+3. 回复至少3句话，控制在150-300字之间。要有层次感，从具体事件到品质分析再到温暖鼓励。
 4. 直接输出夸奖内容，不要加引号、标题或多余格式。`;
 
   try {
@@ -60,7 +85,7 @@ async function callDeepSeek(input, style) {
           { role: 'system', content: systemPrompt },
           { role: 'user', content: `今天我${input}` },
         ],
-        max_tokens: 300,
+        max_tokens: 500,
         temperature: 0.9,
       }),
     });
@@ -70,7 +95,7 @@ async function callDeepSeek(input, style) {
     }
 
     const data = await response.json();
-    return data.choices?.[0]?.message?.content || FALLBACKS[style] || FALLBACKS.gentle;
+    return data.choices?.[0]?.message?.content || null;
   } catch (err) {
     console.error('DeepSeek API error:', err);
     return null; // null means use fallback
@@ -95,7 +120,7 @@ export default function PraiseGenerator({ addSand, addBadge }) {
     const result = await apiPromise;
     await minDelay;
 
-    const finalPraise = result || FALLBACKS[style] || FALLBACKS.gentle;
+    const finalPraise = result || getFallback(style);
     setPraise(finalPraise);
     setIsGenerating(false);
     setShowModal(true);
